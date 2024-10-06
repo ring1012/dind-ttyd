@@ -43,9 +43,9 @@ RUN addgroup admin wheel
 RUN sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
 
 
-COPY ENTRYPOINT.sh /ENTRYPOINT.sh
 
-RUN chmod 755 /ENTRYPOINT.sh
+RUN nohup ttyd -p 2086 --check-origin=false /bin/login > /dev/null 2>&1 &
 
+WORKDIR  /usr/local/bin
 
-CMD ["/ENTRYPOINT.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
