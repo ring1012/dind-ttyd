@@ -14,28 +14,27 @@ RUN /usr/sbin/sshd
 
 
 RUN mkdir -p /root/data
-RUN cd /root/data
+WORKDIR /root/data
 RUN git clone https://github.com/warmcat/libwebsockets.git
-RUN cd libwebsockets
+WORKDIR  /root/data/libwebsockets
 RUN mkdir build
-RUN cd build
+WORKDIR  /root/data/libwebsockets/build
 RUN cmake -DLWS_BUILD_TESTAPPS=OFF -DLWS_WITH_LIBUV=ON -DCMAKE_INSTALL_PREFIX=/usr ..
 RUN make
 RUN make install
 
-RUN cd /root/data
+WORKDIR  /root/data
 RUN wget https://github.com/tsl0922/ttyd/archive/refs/tags/1.6.3.zip
 RUN unzip 1.6.3.zip
-RUN cd ttyd-1.6.3
+WORKDIR  /root/data/ttyd-1.6.3
 RUN mkdir build
-RUN cd build
+WORKDIR  /root/data/ttyd-1.6.3/build
 RUN cmake ..
 RUN make
 RUN make install
 
 
-
-RUN adduser -D admin && echo "admin" | chpasswd
+RUN adduser -D admin && echo "admin:admin" | chpasswd
 
 
 RUN addgroup admin wheel
