@@ -9,4 +9,4 @@ RUN chmod 755 /ENTRYPOINT.sh
 RUN /ttyd.sh 
 
 
-ENTRYPOINT ["/ENTRYPOINT.sh"]
+CMD ["/ENTRYPOINT.sh"]
