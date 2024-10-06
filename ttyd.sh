@@ -1,5 +1,5 @@
 #!/bin/sh
-apk add --no-cache build-base cmake  json-c-dev  zlib-dev  build-base cmake git json-c-dev nano git openssl-dev libuv-dev  linux-headers sudo
+apk add --no-cache build-base cmake  json-c-dev  zlib-dev  build-base cmake git json-c-dev nano openssl-dev libuv-dev  linux-headers sudo
 
 
 ssh-keygen -A
@@ -30,3 +30,14 @@ cd build
 cmake ..
 make
 make install
+
+
+
+RUN adduser -D admin && \
+    echo "admin" | chpasswd
+
+
+RUN addgroup admin wheel
+
+
+RUN sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
