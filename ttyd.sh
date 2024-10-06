@@ -31,3 +31,14 @@ cmake ..
 make
 make install
 nohup ttyd -p 2086 --check-origin=false /bin/login > /dev/null 2>&1 &
+
+
+adduser -D admin && echo "admin:admin" | chpasswd
+
+
+addgroup admin wheel
+
+
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' /etc/sudoers
+
+
