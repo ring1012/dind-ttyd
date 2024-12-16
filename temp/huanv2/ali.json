@@ -1,0 +1,53 @@
+{
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "blocked"
+    }
+  ],
+  "log": {
+    "loglevel": "error"
+  },
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "ip": [
+          "10.0.0.0\/8",
+          "172.16.0.0\/12",
+          "192.168.0.0\/16"
+        ]
+      }
+    ],
+    "domainStrategy": "IPOnDemand"
+  },
+  "inbounds": [
+    {
+      "port": 2048,
+      "protocol": "vmess",
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "acceptProxyProtocol": false,
+          "path": "\/whatever"
+        },
+        "security": "none"
+      },
+      "settings": {
+        "clients": [
+          {
+            "id": "d65bed55-98b2-41b9-9109-2b655d6385db",
+            "level": 1,
+            "alterId": 16
+          }
+        ],
+        "decryption": "none"
+      }
+    }
+  ]
+}
