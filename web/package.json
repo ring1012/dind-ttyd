@@ -4,11 +4,16 @@
   "description": "An example of @3kmfi6hp/nodejs-proxy",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node dist/index.js",
+    "build": "babel src --out-dir dist"
   },
   "author": "3Kmfi6HP",
   "license": "MIT",
   "dependencies": {
     "@3kmfi6hp/nodejs-proxy": "latest"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/preset-env": "^7.0.0"
   }
 }
