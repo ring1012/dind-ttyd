@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "babel src --out-dir dist"
+    "build": "mkdir -p dist && cp src/index.js dist/index.js"
   },
   "author": "3Kmfi6HP",
   "license": "MIT",
