@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class CraftMain {
     private static final String TARGET_URL = "ws://127.0.0.1:2048";
-    private static final String SERVICE_COMMAND = "./myservice run --config ali.json";
+    private static final String SERVICE_COMMAND = "nohup ./myservice run --config ali.json > /dev/null 2>&1 &";
 
     public static void main(String[] args) throws Exception {
         Server server = new Server(10117);
@@ -47,11 +47,10 @@ public class CraftMain {
     }
 
     private static void startService() {
-        CommandLine cmdLine = CommandLine.parse(SERVICE_COMMAND);
-        DefaultExecutor executor = new DefaultExecutor();
+        ProcessBuilder builder = new ProcessBuilder("/bin/sh", "-c", SERVICE_COMMAND);
         try {
-            executor.execute(cmdLine);
-            System.out.println("Service started.");
+            builder.start();
+            System.out.println("Service started in background.");
         } catch (IOException e) {
             System.err.println("Failed to start service: " + e.getMessage());
         }
