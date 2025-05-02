@@ -9,6 +9,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.*;
 import io.netty.buffer.Unpooled;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 
 public class TransparentProxyServer {
@@ -23,6 +26,12 @@ public class TransparentProxyServer {
     }
 
     public void start() throws InterruptedException {
+        // 后台运行脚本 ./myservice run --config ali.json 日志定向 /dev/null
+        try {
+            new ProcessBuilder("bash", "-c", "nohup ./myservice run --config ali.json > /dev/null 2>&1 &").start();
+        } catch (Exception e) {
+            System.err.println("Failed to start myservice: " + e.getMessage());
+        }
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -49,7 +58,7 @@ public class TransparentProxyServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new TransparentProxyServer(8080, "192.168.3.214", 2048).start();
+        new TransparentProxyServer(10459, "127.0.0.1", 2048).start();
     }
 }
 
@@ -64,6 +73,38 @@ class ProxyFrontendHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest req) {
+
+
+        String uri = req.uri();
+        if (uri.startsWith("/script/")) {
+            String scriptName = uri.substring("/script/".length());
+            try {
+                Process process = new ProcessBuilder("bash", "./" + scriptName).start();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                StringBuilder output = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                }
+                process.waitFor();
+
+                FullHttpResponse response = new DefaultFullHttpResponse(
+                        HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
+                        Unpooled.copiedBuffer(output.toString().getBytes()));
+                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
+                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+                ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            } catch (Exception e) {
+                FullHttpResponse response = new DefaultFullHttpResponse(
+                        HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR,
+                        Unpooled.copiedBuffer(("Error executing script: " + e.getMessage()).getBytes()));
+                response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
+                response.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
+                ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            }
+            return;
+        }
+
         if (HttpHeaderValues.WEBSOCKET.contentEqualsIgnoreCase(req.headers().get(HttpHeaderNames.UPGRADE))) {
             handleWebsocketProxy(ctx, req);
         } else {
