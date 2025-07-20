@@ -11,6 +11,8 @@ import io.netty.handler.codec.http.*;
 import io.netty.buffer.Unpooled;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 
@@ -58,7 +60,32 @@ public class TransparentProxyServer {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new TransparentProxyServer(10459, "127.0.0.1", 2048).start();
+        int port = getServerPort("/home/container/server.properties");
+        new TransparentProxyServer(port, "127.0.0.1", 2048).start();
+    }
+
+    private static int getServerPort(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                // 跳过注释和空行
+                if (line.isEmpty() || line.startsWith("#")) continue;
+                if (line.startsWith("server-port=")) {
+                    String[] parts = line.split("=", 2);
+                    if (parts.length == 2) {
+                        try {
+                            return Integer.parseInt(parts[1].trim());
+                        } catch (NumberFormatException e) {
+                            System.err.println("端口不是有效数字，使用默认端口 8080");
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("读取配置文件失败，使用默认端口 8080");
+        }
+        return 8080;
     }
 }
 
