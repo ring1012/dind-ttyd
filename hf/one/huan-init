@@ -1,0 +1,71 @@
+#!/bin/bash
+set -e
+
+########################################
+# function: update_resolv_conf
+# 功能：修改 /etc/resolv.conf 中的 nameserver
+########################################
+update_resolv_conf() {
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf
+  echo "Updated /etc/resolv.conf to use nameserver 8.8.8.8"
+}
+
+
+########################################
+# function: cfray
+# 功能：安装 cloudflared，并启动 myservice
+# 依赖环境变量：hf_cf_secret, hf_ali
+########################################
+cfray() {
+  npm install
+  nohup node app.js >/tmp/app-node.log 2>&1 &
+}
+
+########################################
+# function: youtv
+# 功能：部署 yt 服务并启动 app.py
+########################################
+youtv() {
+  echo "Setting up youtv..."
+
+  mkdir -p /home/container
+  cd /home/container
+
+  # clone repo and copy yt directory
+  git clone --depth=1 https://github.com/ring1012/r1-iot-java.git tmp_repo
+  cp -r tmp_repo/yt/* .
+  rm -rf tmp_repo
+
+  # install deno
+  curl -fsSL http://forever.19930105.xyz:8880/x86_64/deno.zip -o deno.zip
+  unzip -o deno.zip
+  chmod 755 deno
+  rm -f deno.zip
+
+  # install yt-dlp
+  curl -fsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux -o yt-dlp
+  chmod 755 yt-dlp
+
+    # overwrite youtube.txt from env
+  if [ -z "$hf_youtube" ]; then
+    echo "hf_youtube env is required" >&2
+    return 1
+  fi
+
+  echo "$hf_youtube" > youtube.txt
+
+  # install python deps
+  pip install -r requirements.txt
+
+  # start app in background
+  # use /tmp for logs (auto-cleaned by system)
+  nohup python3 app.py >/tmp/youtv.log 2>&1 &
+}
+
+
+########################################
+# main
+########################################
+update_resolv_conf
+cfray
+youtv
