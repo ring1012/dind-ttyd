@@ -1,0 +1,15 @@
+{
+  "name": "chat",
+  "description": "ai chat",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "vevc",
+  "license": "MIT",
+  "dependencies": {
+    "npm": "^11.7.0",
+    "ws": "^8.18.2"
+  }
+}
