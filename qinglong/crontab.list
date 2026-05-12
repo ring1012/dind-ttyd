@@ -1,0 +1,9 @@
+0 10 1,3,5 4 * real_time=false no_tee=true ID=6 log_name=bash task bash <(curl -sSL "https://raw.githubusercontent.com/ring1012/dind-ttyd/refs/heads/master/qinglong/notify.sh") "xyz每年-ring1012" "https://www.spaceship.com/zh/application/domain-list-application/"
+0 10 1,3,5 4 * real_time=false no_tee=true ID=5 log_name=bash task bash <(curl -sSL "https://raw.githubusercontent.com/ring1012/dind-ttyd/refs/heads/master/qinglong/notify.sh") "ppua每年" "https://nic.ua/en/my/domains/2750243"
+0 10,12,14 1 1,7 * real_time=false no_tee=true ID=4 log_name=bash task bash <(curl -sSL "https://raw.githubusercontent.com/ring1012/dind-ttyd/refs/heads/master/qinglong/notify.sh") "dpdns续费域名" "https://dash.domain.digitalplat.org/domains"
+# 0 10 9-11 * *  real_time=false no_tee=true ID=3 log_name=bash task bash <(curl -sSL "https://raw.githubusercontent.com/ring1012/dind-ttyd/refs/heads/master/qinglong/notify.sh") "每月web续费" "https://web.freecloud.ltd/index.php?rp=/service-renewals"
+# 0 10 * * *  real_time=false no_tee=true ID=2 log_name=bash_2 task bash -c 'OFFSET=$(( ( $(date +%s) - $(date -d "2026-05-11" +%s) ) / 86400 % 10 ));
+if [ $OFFSET -ge 7 ] && [ $OFFSET -le 9 ]; then
+    bash <(curl -sSL "https://raw.githubusercontent.com/ring1012/dind-ttyd/refs/heads/master/qinglong/notify.sh") "10天续期ipv6 lxc" "https://freecloud.ltd/server/lxc";
+fi'
+0 10,14 * * * real_time=false no_tee=true ID=1 log_name=pwd task bash <(curl -sSL "https://raw.githubusercontent.com/ring1012/dind-ttyd/refs/heads/master/qinglong/notify.sh") "natfree 每日积分" "https://nat.freecloud.ltd/"
